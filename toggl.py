@@ -55,12 +55,12 @@ Parser = None   # OptionParser initialized by main()
 VISIT_WWW_COMMAND = "open http://www.toggl.com/app/timer"
 
 #############################################################################
-#    _   _ _   _ _ _ _            ____ _                         
-#   | | | | |_(_) (_) |_ _   _   / ___| | __ _ ___ ___  ___  ___ 
+#    _   _ _   _ _ _ _            ____ _
+#   | | | | |_(_) (_) |_ _   _   / ___| | __ _ ___ ___  ___  ___
 #   | | | | __| | | | __| | | | | |   | |/ _` / __/ __|/ _ \/ __|
 #   | |_| | |_| | | | |_| |_| | | |___| | (_| \__ \__ \  __/\__ \
 #    \___/ \__|_|_|_|\__|\__, |  \____|_|\__,_|___/___/\___||___/
-#                        |___/                                   
+#                        |___/
 #############################################################################
 
 #----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ class Singleton(type):
     """
     def __init__(cls, name, bases, dict):
         super(Singleton, cls).__init__(name, bases, dict)
-        cls.instance = None 
+        cls.instance = None
 
     def __call__(cls,*args,**kw):
         if cls.instance is None:
@@ -150,11 +150,11 @@ class DateAndTime(object):
     __metaclass__ = Singleton
 
     def __init__(self):
-        self.tz = pytz.timezone( Config().get('options', 'timezone') ) 
+        self.tz = pytz.timezone( Config().get('options', 'timezone') )
 
     def duration_since_epoch(self, dt):
         """
-        Converts the given localized datetime object to the number of 
+        Converts the given localized datetime object to the number of
         seconds since the epoch.
         """
         return (dt.astimezone(pytz.UTC) - datetime.datetime(1970,1,1,tzinfo=pytz.UTC)).total_seconds()
@@ -173,7 +173,7 @@ class DateAndTime(object):
             duration += int(elements[0]) * 60
             elements = elements[1:]
         duration += int(elements[0])
-        
+
         return duration
 
     def elapsed_time(self, seconds, suffixes=['y','w','d','h','m','s'], add_s=False, separator=''):
@@ -184,7 +184,7 @@ class DateAndTime(object):
         """
         # the formatted time string to be returned
         time = []
-        
+
         # the pieces of time to iterate over (days, hours, minutes, etc)
         # - the first piece in each tuple is the suffix (d, h, w)
         # - the second piece is the length in seconds (a day is 60s * 60m * 24h)
@@ -194,7 +194,7 @@ class DateAndTime(object):
                   (suffixes[3], 60 * 60),
                   (suffixes[4], 60),
                   (suffixes[5], 1)]
-        
+
         # for each time piece, grab the value and remaining seconds, and add it to
         # the time string
         for suffix, length in parts:
@@ -205,7 +205,7 @@ class DateAndTime(object):
                     (suffix, (suffix, suffix + 's')[value > 1])[add_s]))
             if seconds < 1:
                 break
-        
+
         return separator.join(time)
 
     def format_time(self, time):
@@ -227,8 +227,8 @@ class DateAndTime(object):
         """
         Returns "now" as a localized datetime object.
         """
-        return self.tz.localize( datetime.datetime.now() ) 
- 
+        return self.tz.localize( datetime.datetime.now() )
+
     def parse_local_datetime_str(self, datetime_str):
         """
         Parses a local datetime string (e.g., "2:00pm") and returns
@@ -238,7 +238,7 @@ class DateAndTime(object):
 
     def parse_iso_str(self, iso_str):
         """
-        Parses an ISO 8601 datetime string and returns a localized datetime 
+        Parses an ISO 8601 datetime string and returns a localized datetime
         object.
         """
         return iso8601.parse_date(iso_str).astimezone(self.tz)
@@ -248,7 +248,7 @@ class DateAndTime(object):
         Returns 00:00:00 today as a localized datetime object.
         """
         return self.tz.localize(
-            datetime.datetime.combine( datetime.date.today(), datetime.time.min) 
+            datetime.datetime.combine( datetime.date.today(), datetime.time.min)
         )
 
     def start_of_yesterday(self):
@@ -256,12 +256,12 @@ class DateAndTime(object):
         Returns 00:00:00 yesterday as a localized datetime object.
         """
         return self.tz.localize(
-            datetime.datetime.combine( datetime.date.today(), datetime.time.min) - 
+            datetime.datetime.combine( datetime.date.today(), datetime.time.min) -
             datetime.timedelta(days=1) # subtract one day from today at midnight
         )
 
 #----------------------------------------------------------------------------
-# Logger 
+# Logger
 #----------------------------------------------------------------------------
 class Logger(object):
     """
@@ -282,7 +282,7 @@ class Logger(object):
     def debug(msg, end="\n"):
         """
         Prints msg if the current logging level >= DEBUG.
-        """ 
+        """
         if Logger.level >= Logger.DEBUG:
             print("{}{}".format(msg, end)),
 
@@ -290,7 +290,7 @@ class Logger(object):
     def info(msg, end="\n"):
         """
         Prints msg if the current logging level >= INFO.
-        """ 
+        """
         if Logger.level >= Logger.INFO:
             print("{}{}".format(msg, end)),
 
@@ -301,7 +301,7 @@ def toggl(url, method, data=None, headers={'content-type' : 'application/json'})
     """
     Makes an HTTP request to toggl.com. Returns the raw text data received.
     """
-    url = "{}{}".format(TOGGL_URL, url)   
+    url = "{}{}".format(TOGGL_URL, url)
     try:
         if method == 'delete':
             r = requests.delete(url, auth=Config().get_auth(), data=data, headers=headers)
@@ -322,12 +322,12 @@ def toggl(url, method, data=None, headers={'content-type' : 'application/json'})
         #sys.exit(1)
 
 #############################################################################
-#    _                    _   __  __           _      _     
-#   | |_ ___   __ _  __ _| | |  \/  | ___   __| | ___| |___ 
+#    _                    _   __  __           _      _
+#   | |_ ___   __ _  __ _| | |  \/  | ___   __| | ___| |___
 #   | __/ _ \ / _` |/ _` | | | |\/| |/ _ \ / _` |/ _ \ / __|
 #   | || (_) | (_| | (_| | | | |  | | (_) | (_| |  __/ \__ \
 #    \__\___/ \__, |\__, |_| |_|  |_|\___/ \__,_|\___|_|___/
-#             |___/ |___/                                   
+#             |___/ |___/
 #############################################################################
 
 #----------------------------------------------------------------------------
@@ -336,7 +336,7 @@ def toggl(url, method, data=None, headers={'content-type' : 'application/json'})
 class ClientList(six.Iterator):
     """
     A singleton list of clients. A "client object" is a set of properties
-    as documented at 
+    as documented at
     https://github.com/toggl/toggl_api_docs/blob/master/chapters/clients.md
     """
 
@@ -441,8 +441,8 @@ class WorkspaceList(six.Iterator):
 #----------------------------------------------------------------------------
 class ProjectList(six.Iterator):
     """
-    A singleton list of projects. A "project object" is a dictionary as 
-    documented at 
+    A singleton list of projects. A "project object" is a dictionary as
+    documented at
     https://github.com/toggl/toggl_api_docs/blob/master/chapters/projects.md
     """
 
@@ -519,11 +519,93 @@ class ProjectList(six.Iterator):
         return s.rstrip() # strip trailing \n
 
 #----------------------------------------------------------------------------
+# TagList
+#----------------------------------------------------------------------------
+class TagList(six.Iterator):
+    """
+    A singleton list of tag. A "tag object" is a dictionary as
+    documented at
+    https://github.com/toggl/toggl_api_docs/blob/master/chapters/tags.md
+    """
+
+    __metaclass__ = Singleton
+
+    def __init__(self, workspace_name = None):
+        self.fetch(workspace_name)
+
+    def fetch(self, workspace_name = None):
+        """
+        Fetches the list of tags from toggl.
+        """
+        wid = None
+        if workspace_name is not None:
+            self.workspace = WorkspaceList().find_by_name(workspace_name)
+            if self.workspace is not None:
+                wid = self.workspace["id"]
+        if wid is None:
+            wid = User().get('default_wid')
+            self.workspace = WorkspaceList().find_by_id(wid)
+
+        self.fetch_by_wid(wid)
+
+    def fetch_by_wid(self, wid):
+        result = toggl("/workspaces/{}/tags".format(wid), 'get')
+        self.tag_list = json.loads(result)
+
+    def find_by_id(self, pid):
+        """
+        Returns the tag object with the given id, or None.
+        """
+        for tag in self:
+            if tag['id'] == pid:
+                return tag
+        return None
+
+    def find_by_name(self, name_prefix):
+        """
+        Returns the tag object with the given name (or prefix), or None.
+        """
+        for tag in self:
+            if tag['name'].startswith(name_prefix):
+                return tag
+        return None
+
+    def __iter__(self):
+        """
+        Start iterating over the tags.
+        """
+        self.iter_index = 0
+        return self
+
+    def __next__(self):
+        """
+        Returns the next tag.
+        """
+        if not self.tag_list or self.iter_index >= len(self.tag_list):
+            raise StopIteration
+        else:
+            self.iter_index += 1
+            return self.tag_list[self.iter_index-1]
+
+    def __str__(self):
+        """Formats the tag list as a string."""
+        s = ""
+        clients = ClientList()
+        for tag in self:
+            client_name = ''
+            if 'cid' in tag:
+               for client in clients:
+                   if tag['cid'] == client['id']:
+                       client_name = " - {}".format(client['name'])
+            s = s + ":{} @{}{}\n".format(self.workspace['name'], tag['name'], client_name)
+        return s.rstrip() # strip trailing \n
+
+#----------------------------------------------------------------------------
 # TimeEntry
 #----------------------------------------------------------------------------
 class TimeEntry(object):
     """
-    Represents a single time entry. 
+    Represents a single time entry.
 
     NB: If duration is negative, it represents the amount of elapsed time
     since the epoch. It's not well documented, but toggl expects this duration
@@ -532,23 +614,23 @@ class TimeEntry(object):
 
     def __init__(self, description=None, start_time=None, stop_time=None,
                  duration=None, workspace_name = None, project_name=None,
-                 data_dict=None):
+                 data_dict=None, tags=[]):
         """
         Constructor. None of the parameters are required at object creation,
         but the object is validated before data is sent to toggl.
-        * description(str) is the optional time entry description. 
-        * start_time(datetime) is the optional time this entry started. 
+        * description(str) is the optional time entry description.
+        * start_time(datetime) is the optional time this entry started.
         * stop_time(datetime) is the optional time this entry ended.
-        * duration(int) is the optional duration, in seconds. 
-        * project_name(str) is the optional name of the project without 
+        * duration(int) is the optional duration, in seconds.
+        * project_name(str) is the optional name of the project without
           the '@' prefix.
         * data_dict is an optional dictionary created from a JSON-encoded time
           entry from toggl. If this parameter is used to initialize the object,
-          its values will supercede any other constructor parameters. 
+          its values will supercede any other constructor parameters.
         """
 
         # All toggl data is stored in the "data" dictionary.
-        self.data = {} 
+        self.data = {}
 
         if description is not None:
             self.data['description'] = description
@@ -571,18 +653,21 @@ class TimeEntry(object):
                 raise RuntimeError("Project '{}' not found.".format(project_name))
             self.data['pid'] = project['id']
 
+        if tags:
+            self.data['tags'] = tags
+
         if duration is not None:
             self.data['duration'] = duration
 
         # If we have a dictionary of data, use it to initialize this.
         if data_dict is not None:
             self.data = data_dict
-       
+
         self.data['created_with'] = 'toggl-cli'
 
     def add(self):
         """
-        Adds this time entry as a completed entry. 
+        Adds this time entry as a completed entry.
         """
         self.validate()
         toggl("/time_entries", "post", self.json())
@@ -602,9 +687,9 @@ class TimeEntry(object):
             new_entry = TimeEntry()
             new_entry.data = self.data.copy()
             new_entry.set('at', None)
-            new_entry.set('created_with', 'toggl-cli') 
+            new_entry.set('created_with', 'toggl-cli')
             new_entry.set('duration', None)
-            new_entry.set('duronly', False) 
+            new_entry.set('duronly', False)
             new_entry.set('guid', None)
             new_entry.set('id', None)
             if (continued_at):
@@ -615,7 +700,7 @@ class TimeEntry(object):
             new_entry.set('uid', None)
             new_entry.start()
         else:
-            # To continue an entry from today, set duration to 
+            # To continue an entry from today, set duration to
             # 0 - (current_time - duration).
             now = DateAndTime().duration_since_epoch( DateAndTime().now() )
             duration = ((continued_at or DateAndTime().now()) - DateAndTime().now()).total_seconds()
@@ -635,10 +720,10 @@ class TimeEntry(object):
 
         url = "/time_entries/{}".format(self.get('id'))
         toggl(url, 'delete')
-        
+
     def get(self, prop):
         """
-        Returns the given toggl time entry property as documented at 
+        Returns the given toggl time entry property as documented at
         https://github.com/toggl/toggl_api_docs/blob/master/chapters/time_entries.md
         or None, if the property isn't set.
         """
@@ -653,7 +738,7 @@ class TimeEntry(object):
         None, False otherwise.
         """
         return prop in self.data and self.data[prop] is not None
-            
+
     def json(self):
         """
         Returns a JSON dump of this entire object as toggl payload.
@@ -662,8 +747,8 @@ class TimeEntry(object):
 
     def normalized_duration(self):
         """
-        Returns a "normalized" duration. If the native duration is positive, 
-        it is simply returned. If negative, we return current_time + duration 
+        Returns a "normalized" duration. If the native duration is positive,
+        it is simply returned. If negative, we return current_time + duration
         (the actual amount of seconds this entry has been running). If no
         duration is set, raises an exception.
         """
@@ -676,9 +761,9 @@ class TimeEntry(object):
 
     def set(self, prop, value):
         """
-        Sets the given toggl time entry property to the given value. If 
+        Sets the given toggl time entry property to the given value. If
         value is None, the property is removed from this time entry.
-        Properties are documented at 
+        Properties are documented at
         https://github.com/toggl/toggl_api_docs/blob/master/chapters/time_entries.md
         """
         if value is not None:
@@ -738,7 +823,7 @@ class TimeEntry(object):
             is_running = '  '
         else:
             is_running = '* '
-        
+
         if 'pid' in self.data:
             project = ProjectList().find_by_id(self.data['pid'])
             if project is not None:
@@ -748,11 +833,11 @@ class TimeEntry(object):
                 project_name = " @{} ".format(ProjectList().find_by_id(self.data['pid'])['name'])
             else:
                 project_name = " "
-                
+
         else:
             project_name = " "
 
-        s = "{}{}{}{}".format(is_running, self.data.get('description'), project_name, 
+        s = "{}{}{}{}".format(is_running, self.data.get('description'), project_name,
             DateAndTime().elapsed_time(int(self.normalized_duration())) \
         )
 
@@ -793,7 +878,7 @@ class TimeEntryList(six.Iterator):
         Fetches time entry data from toggl.
         """
         self.reload()
-        
+
     def __iter__(self):
         """
         Start iterating over the time entries.
@@ -803,7 +888,7 @@ class TimeEntryList(six.Iterator):
 
     def find_by_description(self, description):
         """
-        Searches the list of entries for the one matching the given 
+        Searches the list of entries for the one matching the given
         description, or return None. If more than one entry exists
         with a matching description, the most recent one is
         returned.
@@ -886,7 +971,7 @@ class TimeEntryList(six.Iterator):
                 duration += entry.normalized_duration()
             s += "  ({})\n".format(DateAndTime().elapsed_time(int(duration)))
         return s.rstrip() # strip trailing \n
-    
+
 #----------------------------------------------------------------------------
 # User
 #----------------------------------------------------------------------------
@@ -918,12 +1003,12 @@ class User(object):
         return self.data[prop]
 
 #############################################################################
-#     ____                                          _   _     _            
-#    / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| | | |   (_)_ __   ___ 
+#     ____                                          _   _     _
+#    / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| | | |   (_)_ __   ___
 #   | |   / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` | | |   | | '_ \ / _ \
 #   | |__| (_) | | | | | | | | | | | (_| | | | | (_| | | |___| | | | |  __/
 #    \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_| |_____|_|_| |_|\___|
-#                                                                          
+#
 #############################################################################
 
 #----------------------------------------------------------------------------
@@ -937,14 +1022,14 @@ class CLI(object):
 
     def __init__(self, args=None):
         """
-        Initializes the command-line parser and handles the command-line 
+        Initializes the command-line parser and handles the command-line
         options.
         """
 
         # Override the option parser epilog formatting rule.
         # See http://stackoverflow.com/questions/1857346/python-optparse-how-to-include-additional-info-in-usage-output
         optparse.OptionParser.format_epilog = lambda self, formatter: self.epilog
-        
+
         self.parser = optparse.OptionParser(usage="Usage: %prog [OPTIONS] [ACTION]", \
             epilog="\nActions:\n"
             "  add DESCR [:WORKSPACE] [@PROJECT] START_DATETIME ('d'DURATION | END_DATETIME)\n\tcreates a completed time entry\n"
@@ -982,7 +1067,7 @@ class CLI(object):
         if options.debug:
             Logger.level = Logger.DEBUG
         if options.verbose:
-            global VERBOSE 
+            global VERBOSE
             VERBOSE = True
 
     def _add_time_entry(self, args):
@@ -1007,6 +1092,11 @@ class CLI(object):
             project = ProjectList(ws_name).find_by_name(project_name)
             if project == None:
                 raise RuntimeError("Project '{}' not found.".format(project_name))
+        tag_name = self._get_tag_arg(args, optional=True)
+        if tag_name is not None:
+            tag = TagList(ws_name).find_by_name(tag_name)
+            if tag == None:
+                raise RuntimeError("Tag '{}' not found.".format(project_name))
 
         duration = self._get_duration_arg(args, optional=True)
         if duration is not None:
@@ -1034,7 +1124,7 @@ class CLI(object):
         Logger.debug(entry.json())
         entry.add()
         Logger.info('{} added'.format(description))
-        
+
     def act(self):
         """
         Performs the actions described by the list of arguments in self.args.
@@ -1051,6 +1141,8 @@ class CLI(object):
             self._list_current_time_entry()
         elif self.args[0] == "projects":
             self._show_projects(self.args[1:])
+        elif self.args[0] == "tags":
+            self._show_tags(self.args[1:])
         elif self.args[0] == "rm":
             self._delete_time_entry(self.args[1:])
         elif self.args[0] == "start":
@@ -1067,6 +1159,10 @@ class CLI(object):
     def _show_projects(self, args):
         workspace_name = self._get_workspace_arg(args, optional=True)
         print(ProjectList(workspace_name))
+
+    def _show_tags(self, args):
+        workspace_name = self._get_workspace_arg(args, optional=True)
+        print(TagList(workspace_name))
 
     def _continue_entry(self, args):
         """
@@ -1100,7 +1196,7 @@ class CLI(object):
 
             entry.continue_entry(continued_at)
 
-            Logger.info("{} continued at {}".format(entry.get('description'), 
+            Logger.info("{} continued at {}".format(entry.get('description'),
                 DateAndTime().format_time(continued_at or DateAndTime().now())))
         else:
             Logger.info("Did not find '{}' in list of entries.".format(args[0]))
@@ -1191,6 +1287,24 @@ class CLI(object):
         else:
             return args.pop(0)[1:]
 
+    def _get_tag_arg(self, args, optional=False):
+        """
+        If the first entry in args is a project name (e.g., '+tag')
+        then return the name of the project, or None.
+        """
+        if len(args) == 0:
+            if optional:
+                return None
+            else:
+                self.print_help()
+        elif args[0][0] != '+':
+            if optional:
+                return None
+            else:
+                self.print_help()
+        else:
+            return args.pop(0)[1:]
+
     def _get_str_arg(self, args, optional=False):
         """
         Returns the first entry in args as a string, or None.
@@ -1227,6 +1341,7 @@ class CLI(object):
         description = self._get_str_arg(args, optional=False)
         workspace_name = self._get_workspace_arg(args, optional=True)
         project_name = self._get_project_arg(args, optional=True)
+        tag_name = self._get_tag_arg(args, optional=True)
         duration = self._get_duration_arg(args, optional=True)
         if duration is not None:
             start_time = DateAndTime().now() - datetime.timedelta(seconds=duration)
@@ -1239,16 +1354,17 @@ class CLI(object):
             description=description,
             start_time=start_time,
             project_name=project_name,
+            tags=[tag_name],
             workspace_name=workspace_name
         )
         entry.start()
         Logger.debug(entry.json())
         friendly_time = DateAndTime().format_time(DateAndTime().parse_iso_str(entry.get('start')))
         Logger.info('{} started at {}'.format(description, friendly_time))
-        
+
     def _stop_time_entry(self, args):
         """
-        Stops the current time entry. 
+        Stops the current time entry.
         args contains an optional end time.
         """
 
@@ -1268,7 +1384,7 @@ class CLI(object):
 
 def run(cmd):
     parsed = re.findall(r"([\"]([^\"]+)\")|([']([^']+)')|(\S+)", cmd) # Simulates quoting of strings with spaces ("some important task")
-    CLI([i[1] or i[3] or i[4] for i in parsed]).act()
+    CLI([i[1] or i[3] or i[4] or i[5] for i in parsed]).act()
 
 if __name__ == "__main__":
     CLI(sys.argv[1:]).act()

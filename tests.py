@@ -27,10 +27,10 @@ def desc(description):
 # TestClientList
 #----------------------------------------------------------------------------
 class TestClientList(unittest.TestCase):
-    
+
     def setUp(self):
         self.list = toggl.ClientList()
-    
+
     def test_iterator(self):
         num_clients = len(self.list.client_list) if self.list.client_list else 0
         count = 0
@@ -63,10 +63,10 @@ class TestDateAndTime(unittest.TestCase):
 # TestProjectList
 #----------------------------------------------------------------------------
 class TestProjectList(unittest.TestCase):
-    
+
     def setUp(self):
         self.list = toggl.ProjectList()
- 
+
     def test_iterator(self):
         num_projects = len(self.list.project_list)
         count = 0
@@ -88,6 +88,37 @@ class TestProjectList(unittest.TestCase):
 
         # grab first three characters of the first project name
         prefix = self.list.project_list[0]['name'][0:3]
+        self.assertEquals( self.list.find_by_name(prefix)['name'][0:3], prefix )
+
+#----------------------------------------------------------------------------
+# TestTagList
+#----------------------------------------------------------------------------
+class TestTagList(unittest.TestCase):
+
+    def setUp(self):
+        self.list = toggl.TagList()
+
+    def test_iterator(self):
+        num_tags = len(self.list.tag_list)
+        count = 0
+        for client in self.list:
+            count += 1
+        self.assertEquals(count, num_tags)
+
+    def test_find_by_id(self):
+        # invalid id's return None
+        self.assertIsNone( self.list.find_by_id(-1) )
+
+        # otherwise, we get a tag object back
+        id = self.list.tag_list[0]['id']
+        self.assertEquals( self.list.find_by_id(id)['id'], id )
+
+    def test_find_by_name(self):
+        # invalid names return None
+        self.assertIsNone( self.list.find_by_name('XYZ') )
+
+        # grab first three characters of the first project name
+        prefix = self.list.tag_list[0]['name'][0:3]
         self.assertEquals( self.list.find_by_name(prefix)['name'][0:3], prefix )
 
 #----------------------------------------------------------------------------
@@ -113,7 +144,7 @@ class TestTimeEntry(unittest.TestCase):
 
         # create basic entry and add it
         start_time = toggl.DateAndTime().now()
-        self.entry = toggl.TimeEntry(description=desc('add'), 
+        self.entry = toggl.TimeEntry(description=desc('add'),
             start_time=start_time, duration=10)
         self.entry.add()
 
@@ -188,7 +219,7 @@ class TestTimeEntry(unittest.TestCase):
         # test existing, but None property
         self.entry.set('foobar', None)
         self.assertFalse( self.entry.has('foobar') )
-       
+
         # test existing, non-None property
         self.entry.set('foobar', True)
         self.assertTrue( self.entry.has('foobar') )
@@ -216,7 +247,7 @@ class TestTimeEntry(unittest.TestCase):
         # remove value
         self.entry.set('foo', None)
         self.assertFalse('foo' in self.entry.data)
-        
+
     def test_start_simple(self):
         # test with simpliest entry
         self.entry = toggl.TimeEntry(description=desc('start'))
@@ -241,7 +272,7 @@ class TestTimeEntry(unittest.TestCase):
         # see what toggl has
         entry = self.find_time_entry(desc('start2'))
         self.assertIsNotNone(entry)
-       
+
         # toggl duration should be 1 hour
         self.assertGreaterEqual(entry.normalized_duration(), 3600)
 
@@ -261,7 +292,7 @@ class TestTimeEntry(unittest.TestCase):
         self.entry = toggl.TimeEntry(description=desc('stop'))
         self.entry.start()
 
-        # find it 
+        # find it
         entry = self.find_time_entry(desc('stop'))
         self.assertIsNotNone(entry)
 
@@ -283,7 +314,7 @@ class TestTimeEntry(unittest.TestCase):
         # find it
         entry = self.find_time_entry(desc('stop2'))
         self.assertIsNotNone(entry)
-        
+
         # stop it an hour from now
         one_hour_ahead = pytz.UTC.localize(datetime.datetime.utcnow() + datetime.timedelta(hours=1))
         entry.stop(one_hour_ahead)
@@ -309,7 +340,7 @@ class TestTimeEntry(unittest.TestCase):
 # TestTimeEntryList
 #----------------------------------------------------------------------------
 class TestTimeEntryList(unittest.TestCase):
-    
+
     def setUp(self):
         self.list = toggl.TimeEntryList()
 
@@ -331,13 +362,13 @@ class TestTimeEntryList(unittest.TestCase):
         # searching should return the newer entry
         entry2 = self.list.find_by_description(desc('find_by_description'))
         #self.assertNotEquals( entry1.get('start'), entry2.get('start') )
- 
+
     def test_iterator(self):
         num_entries = len(self.list.time_entries)
         count = 0
         for client in self.list:
             count += 1
-        self.assertEquals(count, num_entries) 
+        self.assertEquals(count, num_entries)
 
     def test_now(self):
         # test with no entries running
