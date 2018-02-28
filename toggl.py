@@ -1092,11 +1092,12 @@ class CLI(object):
             project = ProjectList(ws_name).find_by_name(project_name)
             if project == None:
                 raise RuntimeError("Project '{}' not found.".format(project_name))
-        tag_name = self._get_tag_arg(args, optional=True)
-        if tag_name is not None:
-            tag = TagList(ws_name).find_by_name(tag_name)
-            if tag == None:
-                raise RuntimeError("Tag '{}' not found.".format(project_name))
+        tag_names = self._get_tag_arg(args, optional=True)
+        if tag_names is not None:
+            for tag_name in tag_names:
+                tag = TagList(ws_name).find_by_name(tag_name)
+                if tag == None:
+                    raise RuntimeError("Tag '{}' not found.".format(project_name))
 
         duration = self._get_duration_arg(args, optional=True)
         if duration is not None:
@@ -1303,7 +1304,7 @@ class CLI(object):
             else:
                 self.print_help()
         else:
-            return args.pop(0)[1:]
+            return args.pop(0)[1:].split(',')
 
     def _get_str_arg(self, args, optional=False):
         """
@@ -1341,7 +1342,7 @@ class CLI(object):
         description = self._get_str_arg(args, optional=False)
         workspace_name = self._get_workspace_arg(args, optional=True)
         project_name = self._get_project_arg(args, optional=True)
-        tag_name = self._get_tag_arg(args, optional=True)
+        tag_names = self._get_tag_arg(args, optional=True)
         duration = self._get_duration_arg(args, optional=True)
         if duration is not None:
             start_time = DateAndTime().now() - datetime.timedelta(seconds=duration)
@@ -1354,7 +1355,7 @@ class CLI(object):
             description=description,
             start_time=start_time,
             project_name=project_name,
-            tags=[tag_name],
+            tags=tag_names,
             workspace_name=workspace_name
         )
         entry.start()
